@@ -1,0 +1,243 @@
+"""
+Program Daftar Nilai Mahasiswa
+Mengaplikasikan konsep OOP: Class, Instance, Method, Atribut Public/Private,
+Property (Getter/Setter), dan Inheritance
+"""
+
+class Person:
+    """Class untuk merepresentasikan data pribadi seseorang"""
+    
+    def __init__(self, nama):
+        self.nama = nama
+        self.alamat = ""
+        self.__umur = 0  # Atribut private
+    
+    # Property Getter untuk umur
+    @property
+    def umur(self):
+        return self.__umur
+    
+    # Property Setter untuk umur
+    @umur.setter
+    def umur(self, value):
+        if value >= 0:
+            self.__umur = value
+        else:
+            print("Umur tidak boleh negatif!")
+    
+    # Method private untuk cek umur
+    def __cek_umur(self):
+        if self.__umur > 17:
+            return "Sudah Dewasa"
+        else:
+            return "Belum Dewasa"
+    
+    # Method untuk cetak data
+    def cetak_data(self):
+        print("\nNama: {}".format(self.nama))
+        print("Alamat: {}".format(self.alamat))
+        print("Umur: {}".format(self.__umur))
+        print("Status: {}".format(self.__cek_umur()))
+
+
+class Mahasiswa(Person):
+    """Class untuk merepresentasikan data mahasiswa (turunan dari Person)"""
+    
+    def __init__(self, nim, nama):
+        Person.__init__(self, nama)  # Memanggil constructor parent class
+        self.nim = nim
+        self.__nilai = 0.0  # Atribut private
+    
+    # Property Getter untuk nilai
+    @property
+    def nilai(self):
+        return self.__nilai
+    
+    # Property Setter untuk nilai
+    @nilai.setter
+    def nilai(self, value):
+        if 0 <= value <= 100:
+            self.__nilai = value
+        else:
+            print("Nilai harus antara 0-100!")
+    
+    # Method untuk menentukan grade
+    def __tentukan_grade(self):
+        if self.__nilai >= 85:
+            return "A"
+        elif self.__nilai >= 70:
+            return "B"
+        elif self.__nilai >= 60:
+            return "C"
+        elif self.__nilai >= 50:
+            return "D"
+        else:
+            return "E"
+    
+    # Overriding method cetak_data dari parent class
+    def cetak_data(self):
+        print("\n" + "="*50)
+        print("NIM: {}".format(self.nim))
+        print("Nama: {}".format(self.nama))
+        print("Alamat: {}".format(self.alamat))
+        print("Umur: {}".format(self.umur))
+        print("Nilai: {:.2f}".format(self.__nilai))
+        print("Grade: {}".format(self.__tentukan_grade()))
+        print("="*50)
+
+
+class DaftarNilai:
+    """Class untuk mengelola daftar nilai mahasiswa"""
+    
+    def __init__(self):
+        self.data_mahasiswa = []
+    
+    def tambah(self):
+        """Method untuk menambah data mahasiswa baru"""
+        print("\n--- Tambah Data Mahasiswa ---")
+        nim = input("Masukkan NIM: ")
+        nama = input("Masukkan Nama: ")
+        
+        # Cek apakah NIM sudah ada
+        for mhs in self.data_mahasiswa:
+            if mhs.nim == nim:
+                print(f"NIM '{nim}' sudah terdaftar!")
+                return
+        
+        # Buat instance mahasiswa baru
+        mahasiswa = Mahasiswa(nim, nama)
+        
+        # Input data tambahan
+        try:
+            umur = int(input("Masukkan Umur: "))
+            mahasiswa.umur = umur
+        except ValueError:
+            print("Umur harus berupa angka!")
+            return
+        
+        alamat = input("Masukkan Alamat: ")
+        mahasiswa.alamat = alamat
+        
+        try:
+            nilai = float(input("Masukkan Nilai: "))
+            mahasiswa.nilai = nilai
+        except ValueError:
+            print("Nilai harus berupa angka!")
+            return
+        
+        # Tambahkan ke daftar
+        self.data_mahasiswa.append(mahasiswa)
+        print(f"\nData mahasiswa '{nama}' berhasil ditambahkan!")
+    
+    def tampilkan(self):
+        """Method untuk menampilkan semua data mahasiswa"""
+        if len(self.data_mahasiswa) == 0:
+            print("\n--- Daftar Nilai Mahasiswa ---")
+            print("Belum ada data mahasiswa!")
+            return
+        
+        print("\n" + "="*70)
+        print("DAFTAR NILAI MAHASISWA")
+        print("="*70)
+        print(f"{'No':<4} {'NIM':<12} {'Nama':<20} {'Umur':<6} {'Nilai':<8} {'Grade':<6}")
+        print("-"*70)
+        
+        for i, mhs in enumerate(self.data_mahasiswa, 1):
+            grade = "A" if mhs.nilai >= 85 else "B" if mhs.nilai >= 70 else "C" if mhs.nilai >= 60 else "D" if mhs.nilai >= 50 else "E"
+            print(f"{i:<4} {mhs.nim:<12} {mhs.nama:<20} {mhs.umur:<6} {mhs.nilai:<8.2f} {grade:<6}")
+        print("="*70)
+    
+    def hapus(self, nim):
+        """Method untuk menghapus data berdasarkan NIM"""
+        for i, mhs in enumerate(self.data_mahasiswa):
+            if mhs.nim == nim:
+                nama = mhs.nama
+                self.data_mahasiswa.pop(i)
+                print(f"\nData mahasiswa '{nama}' dengan NIM '{nim}' berhasil dihapus!")
+                return
+        print(f"\nData dengan NIM '{nim}' tidak ditemukan!")
+    
+    def ubah(self, nim):
+        """Method untuk mengubah data berdasarkan NIM"""
+        for mhs in self.data_mahasiswa:
+            if mhs.nim == nim:
+                print(f"\n--- Ubah Data Mahasiswa: {mhs.nama} ---")
+                print("1. Ubah Nama")
+                print("2. Ubah Alamat")
+                print("3. Ubah Umur")
+                print("4. Ubah Nilai")
+                
+                pilihan = input("Pilih yang ingin diubah (1-4): ")
+                
+                if pilihan == '1':
+                    mhs.nama = input("Masukkan nama baru: ")
+                    print("Nama berhasil diubah!")
+                elif pilihan == '2':
+                    mhs.alamat = input("Masukkan alamat baru: ")
+                    print("Alamat berhasil diubah!")
+                elif pilihan == '3':
+                    try:
+                        umur_baru = int(input("Masukkan umur baru: "))
+                        mhs.umur = umur_baru
+                        print("Umur berhasil diubah!")
+                    except ValueError:
+                        print("Umur harus berupa angka!")
+                elif pilihan == '4':
+                    try:
+                        nilai_baru = float(input("Masukkan nilai baru: "))
+                        mhs.nilai = nilai_baru
+                        print("Nilai berhasil diubah!")
+                    except ValueError:
+                        print("Nilai harus berupa angka!")
+                else:
+                    print("Pilihan tidak valid!")
+                return
+        
+        print(f"\nData dengan NIM '{nim}' tidak ditemukan!")
+
+
+# Program Utama
+def main():
+    daftar = DaftarNilai()
+    
+    while True:
+        print("\n" + "="*50)
+        print("SISTEM DAFTAR NILAI MAHASISWA")
+        print("="*50)
+        print("1. Tambah Data Mahasiswa")
+        print("2. Tampilkan Semua Data")
+        print("3. Ubah Data Mahasiswa")
+        print("4. Hapus Data Mahasiswa")
+        print("5. Lihat Detail Mahasiswa")
+        print("6. Keluar")
+        print("="*50)
+        
+        pilihan = input("Masukkan pilihan (1-6): ")
+        
+        if pilihan == '1':
+            daftar.tambah()
+        elif pilihan == '2':
+            daftar.tampilkan()
+        elif pilihan == '3':
+            nim = input("Masukkan NIM mahasiswa yang akan diubah: ")
+            daftar.ubah(nim)
+        elif pilihan == '4':
+            nim = input("Masukkan NIM mahasiswa yang akan dihapus: ")
+            daftar.hapus(nim)
+        elif pilihan == '5':
+            nim = input("Masukkan NIM mahasiswa: ")
+            for mhs in daftar.data_mahasiswa:
+                if mhs.nim == nim:
+                    mhs.cetak_data()
+                    break
+            else:
+                print(f"Data dengan NIM '{nim}' tidak ditemukan!")
+        elif pilihan == '6':
+            print("\nTerima kasih telah menggunakan sistem ini!")
+            break
+        else:
+            print("Pilihan tidak valid! Silakan coba lagi.")
+
+
+if __name__ == "__main__":
+    main()
